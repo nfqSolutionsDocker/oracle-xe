@@ -27,12 +27,6 @@ ENV ORACLE_VERSION=11.2.0 \
 	NLS_LANG=AMERICAN.AL32UTF8 \
 	PATH=$PATH:/u01/app/oracle/product/11.2.0/xe/bin
 
-# Script de arranque
-#COPY oracle.sh /solutions/
-#RUN chmod 777 /solutions/oracle.sh && \
-#	chmod a+x /solutions/oracle.sh && \
-#	sed -i -e 's/\r$//' /solutions/oracle.sh
-
 # Configurando sysctl
 RUN echo "net.ipv4.ip_local_port_range = 9000 65500" > /etc/sysctl.conf && \
 	echo "fs.file-max = 6815744" >> /etc/sysctl.conf && \
@@ -54,9 +48,6 @@ RUN echo "root   soft   nproc   2047" >> /etc/security/limits.conf && \
 	
 # Volumenes para el docker
 VOLUME /u01
-
-# RPM installation oracle xe 11g
-#ADD oracle_installation /solutions/oracle_installation
 
 # Puerto de salida del docker
 EXPOSE 1521
