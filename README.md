@@ -10,7 +10,7 @@ This container has the following characteristics:
 For example, docker-compose.yml:
 ```
 app:
- image: nfqsolutions/oracle-xe:11g
+ image: nfqsolutions/oracle-xe-11g
  restart: always
  container_name: oracle-xe-11g
  ports:
