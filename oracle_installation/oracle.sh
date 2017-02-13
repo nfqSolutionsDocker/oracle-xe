@@ -30,7 +30,7 @@ if [ ! -f ${ORACLE_HOME}/config/scripts/oracle-xe ]; then
 		echo_command "Configurando oracle ..."
 		sed -i -E "s/HOST = [^)]+/HOST = $HOSTNAME/g" ${ORACLE_HOME}/network/admin/listener.ora
 		${ORACLE_HOME}/config/scripts/oracle-xe configure responseFile=/u01/Disk1/response/xe.rsp | while read line; do echo_command "configure: $line"; done
-		${ORACLE_HOME}/config/scripts/oracle-xe start | while read line; do echo_command "start: $line"; done
+		${ORACLE_HOME}/config/scripts/oracle-xe start | while read line; do       exit "start: $line"; done
 		lsnrctl status | while read line; do echo_command "lsnrctl: $line"; done
 	fi
 else
@@ -38,7 +38,7 @@ else
 	sed -i -E "s/HOST = [^)]+/HOST = $HOSTNAME/g" ${ORACLE_HOME}/network/admin/listener.ora
 	source /u01/app/oracle/product/11.2.0/xe/bin/oracle_env.sh
 	lsnrctl start | while read line; do echo_command "lsnrctl: $line"; done
-	sqlplus / as sysdba <<-EOF |
+	sqlplus SYS/SYS as sysdba <<-EOF |
 		shutdown;
 		startup;
 		exit 0
