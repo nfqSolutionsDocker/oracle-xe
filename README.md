@@ -18,7 +18,6 @@ app:
   - "1521:1521"
  environment:
   - PACKAGES=
-  - SYS_PASSWORD=SYS
  volumes:
   - <mydirectory>:/u01
  

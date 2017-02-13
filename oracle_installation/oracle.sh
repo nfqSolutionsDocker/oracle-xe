@@ -10,8 +10,8 @@ if [ ! -f ${ORACLE_HOME}/config/scripts/oracle-xe ]; then
 	if [ ! -f /u01/Disk1/*.rpm ]; then
 		echo_red "Fichero de instalacion rpm no encontrado, coloque el fichero de la forma oracle-xe-11.2.0-1.0.x86_64.rpm en el volumen definido del contenedor"
 	else
-		echo_yellow "Fichero de instalacion rpm encontrado"
-		echo_yellow "Instalando oracle ..."
+		echo_command "Fichero de instalacion rpm encontrado"
+		echo_command "Instalando oracle ..."
 		sha1sum /u01/Disk1/*.rpm | grep -q "49e850d18d33d25b9146daa5e8050c71c30390b7"
 		mv /usr/bin/free /usr/bin/free.bak
 		printf "#!/bin/sh\necho Swap - - 2048" > /usr/bin/free
@@ -19,7 +19,7 @@ if [ ! -f ${ORACLE_HOME}/config/scripts/oracle-xe ]; then
 		mv /sbin/sysctl /sbin/sysctl.bak
 		printf "#!/bin/sh" > /sbin/sysctl
 		chmod +x /sbin/sysctl
-		yum localinstall -y /u01/Disk1/*.rpm | while read line; do echo_yellow "install: $line"; done
+		yum localinstall -y /u01/Disk1/*.rpm | while read line; do echo_command "install: $line"; done
 		rm /usr/bin/bc
 		rm /usr/bin/free
 		mv /usr/bin/free.bak /usr/bin/free
@@ -29,23 +29,23 @@ if [ ! -f ${ORACLE_HOME}/config/scripts/oracle-xe ]; then
 		sed -i -e 's/^\(memory_target=.*\)/#\1/' ${ORACLE_HOME}/config/scripts/init.ora
 		echo_command "Configurando oracle ..."
 		sed -i -E "s/HOST = [^)]+/HOST = $HOSTNAME/g" ${ORACLE_HOME}/network/admin/listener.ora
-		${ORACLE_HOME}/config/scripts/oracle-xe configure responseFile=/u01/Disk1/response/xe.rsp | while read line; do echo_yellow "configure: $line"; done
-		${ORACLE_HOME}/config/scripts/oracle-xe start | while read line; do echo_yellow "start: $line"; done
-		lsnrctl status | while read line; do echo_green "lsnrctl: $line"; done
+		${ORACLE_HOME}/config/scripts/oracle-xe configure responseFile=/u01/Disk1/response/xe.rsp | while read line; do echo_command "configure: $line"; done
+		${ORACLE_HOME}/config/scripts/oracle-xe start | while read line; do echo_command "start: $line"; done
+		lsnrctl status | while read line; do echo_command "lsnrctl: $line"; done
 	fi
 else
 	echo_command "Configurando oracle ..."
 	sed -i -E "s/HOST = [^)]+/HOST = $HOSTNAME/g" ${ORACLE_HOME}/network/admin/listener.ora
 	source /u01/app/oracle/product/11.2.0/xe/bin/oracle_env.sh
-	lsnrctl start | while read line; do echo_yellow "lsnrctl: $line"; done
-	sqlplus SYS/${SYS_PASSWORD} AS SYSDBA <<-EOF |
+	lsnrctl start | while read line; do echo_command "lsnrctl: $line"; done
+	sqlplus / as sysdba <<-EOF |
 		shutdown;
 		startup;
 		exit 0
 	EOF
-	while read line; do echo_yellow "sqlplus: $line"; done
+	while read line; do echo_command "sqlplus: $line"; done
 	sleep 10
-	lsnrctl status | while read line; do echo_green "lsnrctl: $line"; done
+	lsnrctl status | while read line; do echo_command "lsnrctl: $line"; done
 fi
 
 /bin/bash

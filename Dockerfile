@@ -5,10 +5,8 @@ MAINTAINER solutions@nfq.com
 # Ficheros que se utilizaran en la instalacion y en el funcionamiento normal
 COPY oracle_installation /oracle_installation
 RUN chmod -R 777 /oracle_installation && \
-	chmod a+x /oracle_installation/oracle.sh && \
-	chmod a+x /oracle_installation/colorecho.sh && \
-	sed -i -e 's/\r$//' /oracle_installation/oracle.sh && \
-	sed -i -e 's/\r$//' /oracle_installation/colorecho.sh
+	chmod a+x /oracle_installation/*.sh && \
+	sed -i -e 's/\r$//' /oracle_installation/*.sh
 
 # Instalacion previa
 RUN yum install -y libaio bc flex net-tools && \
@@ -16,17 +14,15 @@ RUN yum install -y libaio bc flex net-tools && \
 	rm -rf /var/lib/{cache,log} /var/log/lastlog
 	
 # Configurando usuarios
-RUN groupadd -g 200 oinstall && usermod -a -G oinstall root && \
-	groupadd -g 201 dba && usermod -a -G dba root && \
+RUN useradd oracle
+RUN groupadd -g 200 oinstall && groupadd -g 201 dba && \
+	usermod -a -G root,oinstall,dba oracle && \
+	echo "root:solutions" | chpasswd && \
+ 	echo "oracle:solutions" | chpasswd && \
+	echo "oracle ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+	sed -i "s/Defaults    requiretty/#Defaults    requiretty/g" /etc/sudoers && \
 	sed -i "s/pam_namespace.so/pam_namespace.so\nsession    required     pam_limits.so/g" /etc/pam.d/login
 	
-# Variables de entorno
-ENV ORACLE_VERSION=11.2.0 \
-	ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe \
-	ORACLE_SID=XE \
-	NLS_LANG=AMERICAN.AL32UTF8 \
-	PATH=$PATH:/u01/app/oracle/product/11.2.0/xe/bin
-
 # Configurando sysctl
 RUN echo "net.ipv4.ip_local_port_range = 9000 65500" > /etc/sysctl.conf && \
 	echo "fs.file-max = 6815744" >> /etc/sysctl.conf && \
@@ -41,10 +37,19 @@ RUN echo "net.ipv4.ip_local_port_range = 9000 65500" > /etc/sysctl.conf && \
 	echo "fs.aio-max-nr = 1048576" >> /etc/sysctl.conf
 	
 # Configurando limits files
-RUN echo "root   soft   nproc   2047" >> /etc/security/limits.conf && \
-	echo "root   hard   nproc   16384" >> /etc/security/limits.conf && \
-	echo "root   soft   nofile   1024" >> /etc/security/limits.conf && \
-	echo "root   hard   nofile   65536" >> /etc/security/limits.conf
+RUN echo "oracle   soft   nproc   2047" >> /etc/security/limits.conf && \
+	echo "oracle   hard   nproc   16384" >> /etc/security/limits.conf && \
+	echo "oracle   soft   nofile   1024" >> /etc/security/limits.conf && \
+	echo "oracle   hard   nofile   65536" >> /etc/security/limits.conf
+	
+USER oracle
+
+# Variables de entorno
+ENV ORACLE_VERSION=11.2.0 \
+	ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe \
+	ORACLE_SID=XE \
+	NLS_LANG=AMERICAN.AL32UTF8 \
+	PATH=$PATH:/u01/app/oracle/product/11.2.0/xe/bin
 	
 # Volumenes para el docker
 VOLUME /u01
