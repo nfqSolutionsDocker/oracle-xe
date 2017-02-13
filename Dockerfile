@@ -14,12 +14,9 @@ RUN yum install -y libaio bc flex net-tools && \
 	rm -rf /var/lib/{cache,log} /var/log/lastlog
 	
 # Configurando usuarios
-RUN useradd oracle
 RUN groupadd -g 200 oinstall && groupadd -g 201 dba && \
-	usermod -a -G root,oinstall,dba oracle && \
+	usermod -a -G oinstall,dba root && \
 	echo "root:solutions" | chpasswd && \
- 	echo "oracle:solutions" | chpasswd && \
-	echo "oracle ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers && \
 	sed -i "s/Defaults    requiretty/#Defaults    requiretty/g" /etc/sudoers && \
 	sed -i "s/pam_namespace.so/pam_namespace.so\nsession    required     pam_limits.so/g" /etc/pam.d/login
 	
@@ -37,12 +34,10 @@ RUN echo "net.ipv4.ip_local_port_range = 9000 65500" > /etc/sysctl.conf && \
 	echo "fs.aio-max-nr = 1048576" >> /etc/sysctl.conf
 	
 # Configurando limits files
-RUN echo "oracle   soft   nproc   2047" >> /etc/security/limits.conf && \
-	echo "oracle   hard   nproc   16384" >> /etc/security/limits.conf && \
-	echo "oracle   soft   nofile   1024" >> /etc/security/limits.conf && \
-	echo "oracle   hard   nofile   65536" >> /etc/security/limits.conf
-	
-USER oracle
+RUN echo "root   soft   nproc   2047" >> /etc/security/limits.conf && \
+	echo "root   hard   nproc   16384" >> /etc/security/limits.conf && \
+	echo "root   soft   nofile   1024" >> /etc/security/limits.conf && \
+	echo "root   hard   nofile   65536" >> /etc/security/limits.conf
 
 # Variables de entorno
 ENV ORACLE_VERSION=11.2.0 \
