@@ -12,19 +12,19 @@ if [ ! -f ${ORACLE_HOME}/config/scripts/oracle-xe ]; then
 	else
 		echo_command "Fichero de instalacion rpm encontrado"
 		echo_command "Instalando oracle ..."
-		sha1sum /u01/Disk1/*.rpm | grep -q "49e850d18d33d25b9146daa5e8050c71c30390b7"
-		mv /usr/bin/free /usr/bin/free.bak
-		printf "#!/bin/sh\necho Swap - - 2048" > /usr/bin/free
-		chmod +x /usr/bin/free
-		mv /sbin/sysctl /sbin/sysctl.bak
-		printf "#!/bin/sh" > /sbin/sysctl
-		chmod +x /sbin/sysctl
+		#sha1sum /u01/Disk1/*.rpm | grep -q "49e850d18d33d25b9146daa5e8050c71c30390b7"
+		#mv /usr/bin/free /usr/bin/free.bak
+		#printf "#!/bin/sh\necho Swap - - 2048" > /usr/bin/free
+		#chmod +x /usr/bin/free
+		#mv /sbin/sysctl /sbin/sysctl.bak
+		#printf "#!/bin/sh" > /sbin/sysctl
+		#chmod +x /sbin/sysctl
 		yum localinstall -y /u01/Disk1/*.rpm | while read line; do echo_command "install: $line"; done
-		rm /usr/bin/bc
-		rm /usr/bin/free
-		mv /usr/bin/free.bak /usr/bin/free
-		rm /sbin/sysctl
-		mv /sbin/sysctl.bak /sbin/sysctl
+		#rm /usr/bin/bc
+		#rm /usr/bin/free
+		#mv /usr/bin/free.bak /usr/bin/free
+		#rm /sbin/sysctl
+		#mv /sbin/sysctl.bak /sbin/sysctl
 		sed -i -e 's/^\(memory_target=.*\)/#\1/' ${ORACLE_HOME}/config/scripts/initXETemp.ora
 		sed -i -e 's/^\(memory_target=.*\)/#\1/' ${ORACLE_HOME}/config/scripts/init.ora
 		echo_command "Configurando oracle ..."
