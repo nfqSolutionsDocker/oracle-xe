@@ -7,7 +7,7 @@ ORA_DEB="oracle-xe_11.2.0-1.0_amd64.deb"
 #
 downloadOracle () {
 
-	local url="https://github.com/MaksymBilenko/docker-oracle-xe-11g"
+	local url="https://github.com/nfqSolutionsDocker/oracle-xe"
 
 	local ora_deb_partial=( 
 		${ORA_DEB}aa 
